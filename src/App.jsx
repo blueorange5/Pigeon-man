@@ -1,7 +1,6 @@
 import "./App.css"
 
 import { useState, useEffect } from "react"
-
 import { motion } from "framer-motion"
 
 import emailjs from "@emailjs/browser"
@@ -41,14 +40,14 @@ export default function App() {
   const [searchEmail, setSearchEmail] =
     useState("")
 
-  const [foundLetters, setFoundLetters] =
-    useState([])
-
   const [worldLetters, setWorldLetters] =
     useState([])
 
+  const [foundLetters, setFoundLetters] =
+    useState([])
+
   const [selectedMessage, setSelectedMessage] =
-    useState(null)
+    useState("")
 
   useEffect(() => {
 
@@ -147,10 +146,8 @@ export default function App() {
 
       setSenderName("")
       setSenderEmail("")
-
       setReceiverName("")
       setReceiverEmail("")
-
       setMessage("")
 
       loadWorldLetters()
@@ -252,7 +249,7 @@ export default function App() {
 
       </h1>
 
-      {/* WORLD PIGEONS */}
+      {/* RANDOM WORLD PIGEONS */}
 
       {
 
@@ -268,18 +265,13 @@ export default function App() {
 
               onClick={() =>
 
-                setSelectedMessage({
+                setSelectedMessage(
 
-                  sender:
-                    letter.senderName,
+`🕊️ From ${letter.senderName}
 
-                  receiver:
-                    letter.receiverName,
+${letter.message}`
 
-                  message:
-                    letter.message
-
-                })
+                )
 
               }
 
@@ -544,7 +536,7 @@ export default function App() {
 
       </div>
 
-      {/* PERSONAL LETTER PIGEONS */}
+      {/* FOUND LETTER PIGEONS */}
 
       <div
 
@@ -574,18 +566,13 @@ export default function App() {
 
               onClick={() =>
 
-                setSelectedMessage({
+                setSelectedMessage(
 
-                  sender:
-                    letter.senderName,
+`🕊️ From ${letter.senderName}
 
-                  receiver:
-                    letter.receiverName,
+${letter.message}`
 
-                  message:
-                    letter.message
-
-                })
+                )
 
               }
 
@@ -666,40 +653,35 @@ export default function App() {
                   `url(${scroll})`,
 
                 backgroundSize:
-                  "100% 100%",
+                  "contain",
+
+                backgroundPosition:
+                  "center",
 
                 backgroundRepeat:
                   "no-repeat",
 
                 width: "700px",
 
-                height: "900px",
+                minHeight: "900px",
 
-                paddingTop: "170px",
+                paddingTop: "180px",
 
-                paddingLeft: "120px",
+                paddingLeft: "130px",
 
-                paddingRight: "120px",
+                paddingRight: "130px",
 
-                paddingBottom: "170px",
+                paddingBottom: "180px",
 
                 boxSizing: "border-box",
-
-                display: "flex",
-
-                flexDirection: "column",
-
-                justifyContent: "center",
-
-                alignItems: "center",
 
                 textAlign: "center",
 
                 color: "#4b2e19",
 
-                fontSize: "28px",
-
                 fontFamily: "serif",
+
+                fontSize: "28px",
 
                 whiteSpace: "pre-wrap"
 
@@ -707,26 +689,7 @@ export default function App() {
 
             >
 
-              🕊️ From {
-
-                selectedMessage.sender
-
-              }
-
-              to {
-
-                selectedMessage.receiver
-
-              }
-
-              <br />
-              <br />
-
-              {
-
-                selectedMessage.message
-
-              }
+              {selectedMessage}
 
               <br />
               <br />
@@ -734,7 +697,7 @@ export default function App() {
               <button
 
                 onClick={() =>
-                  setSelectedMessage(null)
+                  setSelectedMessage("")
                 }
 
                 style={{
@@ -745,11 +708,11 @@ export default function App() {
 
                   border: "none",
 
+                  cursor: "pointer",
+
                   background: "#5c3b1e",
 
-                  color: "white",
-
-                  cursor: "pointer"
+                  color: "white"
 
                 }}
 

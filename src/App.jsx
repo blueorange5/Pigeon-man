@@ -1,8 +1,13 @@
+import "./App.css"
+
 import sky from "./assets/sky.png"
 import pigeon from "./assets/pigeon.png"
+import scroll from "./assets/scroll.png"
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
+
+import emailjs from "@emailjs/browser"
 
 import { db } from "./firebase"
 
@@ -12,31 +17,37 @@ import {
   getDocs
 } from "firebase/firestore"
 
-import emailjs from "@emailjs/browser"
-
 export default function App() {
 
-  const [senderName, setSenderName] = useState("")
-  const [senderEmail, setSenderEmail] = useState("")
+  const WEBSITE_URL =
+    "https://pigeon-man.vercel.app"
 
-  const [receiverName, setReceiverName] = useState("")
-  const [receiverEmail, setReceiverEmail] = useState("")
+  const [senderName, setSenderName] =
+    useState("")
 
-  const [message, setMessage] = useState("")
+  const [senderEmail, setSenderEmail] =
+    useState("")
 
-  const [searchEmail, setSearchEmail] = useState("")
+  const [receiverName, setReceiverName] =
+    useState("")
+
+  const [receiverEmail, setReceiverEmail] =
+    useState("")
+
+  const [message, setMessage] =
+    useState("")
+
+  const [searchEmail, setSearchEmail] =
+    useState("")
+
+  const [worldLetters, setWorldLetters] =
+    useState([])
 
   const [foundLetters, setFoundLetters] =
     useState([])
 
   const [selectedMessage, setSelectedMessage] =
     useState("")
-
-  const [worldLetters, setWorldLetters] =
-    useState([])
-
-  const WEBSITE_URL =
-    "https://pigeon-man.vercel.app"
 
   useEffect(() => {
 
@@ -47,7 +58,9 @@ export default function App() {
   async function loadWorldLetters() {
 
     const snapshot =
-      await getDocs(collection(db, "letters"))
+      await getDocs(
+        collection(db, "letters")
+      )
 
     const letters = []
 
@@ -73,50 +86,44 @@ export default function App() {
 
       !senderName ||
       !senderEmail ||
-
       !receiverName ||
       !receiverEmail ||
-
       !message
 
     ) {
 
-      alert("Fill all fields 🕊️")
+      alert("Fill all fields ")
+
       return
 
     }
 
     try {
 
-      // SAVE TO FIREBASE
+      const docRef =
+        await addDoc(
 
-      const docRef = await addDoc(
+          collection(db, "letters"),
 
-        collection(db, "letters"),
+          {
 
-        {
+            senderName,
+            senderEmail,
 
-          senderName,
-          senderEmail,
+            receiverName,
+            receiverEmail,
 
-          receiverName,
-          receiverEmail,
+            message,
 
-          message,
+            createdAt: Date.now()
 
-          createdAt: Date.now()
+          }
 
-        }
-
-      )
-
-      // REAL WEBSITE LINK
+        )
 
       const pigeonLink =
 
-        `${WEBSITE_URL}/?id=${docRef.id}`
-
-      // SEND EMAIL
+        `${WEBSITE_URL}`
 
       await emailjs.send(
 
@@ -152,7 +159,9 @@ export default function App() {
 
       loadWorldLetters()
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
       console.log(error)
 
@@ -165,8 +174,9 @@ export default function App() {
   async function openPigeons() {
 
     const snapshot =
-
-      await getDocs(collection(db, "letters"))
+      await getDocs(
+        collection(db, "letters")
+      )
 
     const letters = []
 
@@ -177,7 +187,9 @@ export default function App() {
       if (
 
         data.receiverEmail
-          .toLowerCase() ===
+          .toLowerCase()
+
+        ===
 
         searchEmail
           .toLowerCase()
@@ -200,7 +212,8 @@ export default function App() {
 
       style={{
 
-        backgroundImage: `url(${sky})`,
+        backgroundImage:
+          `url(${sky})`,
 
         backgroundSize: "cover",
 
@@ -230,7 +243,10 @@ export default function App() {
 
           margin: 0,
 
-          paddingTop: "30px"
+          paddingTop: "30px",
+
+          textShadow:
+            "0px 0px 20px rgba(0,0,0,0.5)"
 
         }}
 
@@ -240,100 +256,90 @@ export default function App() {
 
       </h1>
 
+      {/* RANDOM WORLD PIGEONS */}
+
       {
 
         worldLetters
           .slice(0, 10)
-          .map((letter, index) => {
+          .map((letter, index) => (
 
-            const startX =
-              Math.random() *
-              window.innerWidth
+            <motion.img
 
-            const endX =
-              Math.random() *
-              window.innerWidth
+              key={index}
 
-            const startY =
-              100 +
-              Math.random() * 500
+              src={pigeon}
 
-            return (
+              onClick={() =>
 
-              <motion.img
+                setSelectedMessage(
 
-                key={index}
+                  `🕊️ From ${letter.senderName} to ${letter.receiverName}
 
-                src={pigeon}
+${letter.message}`
 
-                onClick={() =>
+                )
 
-                  setSelectedMessage(
+              }
 
-                    `🕊️ From ${letter.senderName} to ${letter.receiverName}\n\n${letter.message}`
+              initial={{
 
-                  )
+                x:
+                  Math.random() *
+                  window.innerWidth,
 
-                }
+                y:
+                  100 +
+                  Math.random() * 500
 
-                initial={{
+              }}
 
-                  x: startX,
+              animate={{
 
-                  y: startY,
+                x:
+                  Math.random() *
+                  window.innerWidth,
 
-                  rotate: 0
+                y: [
 
-                }}
+                  100,
+                  150,
+                  120,
+                  170,
+                  100
 
-                animate={{
+                ],
 
-                  x: endX,
+                rotate:
+                  [-5, 5, -5]
 
-                  y: [
+              }}
 
-                    startY,
+              transition={{
 
-                    startY - 40,
+                duration:
+                  12 +
+                  Math.random() * 10,
 
-                    startY + 20,
+                repeat: Infinity,
 
-                    startY - 30,
+                ease: "linear"
 
-                    startY
+              }}
 
-                  ],
+              style={{
 
-                  rotate: [-5, 5, -5]
+                width: "70px",
 
-                }}
+                position: "absolute",
 
-                transition={{
+                cursor: "pointer"
 
-                  duration:
-                    12 + Math.random() * 10,
+              }}
 
-                  repeat: Infinity,
+            />
 
-                  ease: "linear"
-
-                }}
-
-                style={{
-
-                  width: "70px",
-
-                  position: "absolute",
-
-                  cursor: "pointer"
-
-                }}
-
-              />
-
-            )
-
-          })
+          ))
 
       }
 
@@ -378,75 +384,72 @@ export default function App() {
 
         >
 
-          Send a Pigeon 🕊️
+          Send a Pigeon 
 
         </h2>
 
         <input
-
           placeholder="Your Name"
-
           value={senderName}
-
           onChange={(e) =>
             setSenderName(e.target.value)
           }
-
         />
 
         <input
-
           placeholder="Your Email"
-
           value={senderEmail}
-
           onChange={(e) =>
             setSenderEmail(e.target.value)
           }
-
         />
 
         <input
-
           placeholder="Receiver Name"
-
           value={receiverName}
-
           onChange={(e) =>
             setReceiverName(e.target.value)
           }
-
         />
 
         <input
-
           placeholder="Receiver Email"
-
           value={receiverEmail}
-
           onChange={(e) =>
             setReceiverEmail(e.target.value)
           }
-
         />
 
         <textarea
-
-          placeholder="Write your letter..."
-
           rows="7"
-
+          placeholder="Write your secret letter..."
           value={message}
-
           onChange={(e) =>
             setMessage(e.target.value)
           }
-
         />
 
-        <button onClick={sendPigeon}>
+        <button
 
-          Send Pigeon 🕊️
+          onClick={sendPigeon}
+
+          style={{
+
+            padding: "12px",
+
+            borderRadius: "10px",
+
+            border: "none",
+
+            cursor: "pointer",
+
+            fontWeight: "bold"
+
+          }}
+
+        >
+
+          Send Pigeon 
 
         </button>
 
@@ -509,7 +512,25 @@ export default function App() {
 
         />
 
-        <button onClick={openPigeons}>
+        <button
+
+          onClick={openPigeons}
+
+          style={{
+
+            padding: "12px",
+
+            borderRadius: "10px",
+
+            border: "none",
+
+            cursor: "pointer",
+
+            fontWeight: "bold"
+
+          }}
+
+        >
 
           Open Letters
 
@@ -517,61 +538,81 @@ export default function App() {
 
       </div>
 
-      {/* PERSONAL LETTERS */}
+      {/* PERSONAL PIGEONS */}
 
-      {
+      <div
 
-        foundLetters.map((letter, index) => (
+        style={{
 
-          <motion.img
+          display: "flex",
 
-            key={index}
+          flexWrap: "wrap",
 
-            src={pigeon}
+          justifyContent: "center",
 
-            onClick={() =>
+          marginTop: "40px"
 
-              setSelectedMessage(
+        }}
 
-                `🕊️ From ${letter.senderName} to ${letter.receiverName}\n\n${letter.message}`
+      >
 
-              )
+        {
 
-            }
+          foundLetters.map((letter, index) => (
 
-            animate={{
+            <motion.img
 
-              y: [0, -20, 0],
+              key={index}
 
-              rotate: [-5, 5, -5]
+              src={pigeon}
 
-            }}
+              onClick={() =>
 
-            transition={{
+                setSelectedMessage(
 
-              duration: 2,
+                  `🕊️ From ${letter.senderName} to ${letter.receiverName}
 
-              repeat: Infinity
+${letter.message}`
 
-            }}
+                )
 
-            style={{
+              }
 
-              width: "90px",
+              animate={{
 
-              margin: "20px",
+                y: [0, -20, 0],
 
-              cursor: "pointer"
+                rotate: [-5, 5, -5]
 
-            }}
+              }}
 
-          />
+              transition={{
 
-        ))
+                duration: 2,
 
-      }
+                repeat: Infinity
 
-      {/* LETTER POPUP */}
+              }}
+
+              style={{
+
+                width: "100px",
+
+                margin: "20px",
+
+                cursor: "pointer"
+
+              }}
+
+            />
+
+          ))
+
+        }
+
+      </div>
+
+      {/* SCROLL POPUP */}
 
       {
 
@@ -610,17 +651,38 @@ export default function App() {
 
               style={{
 
-                background: "#f5deb3",
+                backgroundImage:
+                  `url(${scroll})`,
 
-                padding: "30px",
+                backgroundSize:
+                  "100% 100%",
 
-                borderRadius: "20px",
+                backgroundRepeat:
+                  "no-repeat",
 
-                width: "400px",
+                width: "600px",
 
-                whiteSpace: "pre-wrap",
+                height: "800px",
 
-                fontSize: "20px"
+                paddingTop: "140px",
+
+                paddingLeft: "90px",
+
+                paddingRight: "90px",
+
+                paddingBottom: "140px",
+
+                boxSizing: "border-box",
+
+                color: "#3b2414",
+
+                fontFamily: "serif",
+
+                fontSize: "22px",
+
+                overflowY: "auto",
+
+                whiteSpace: "pre-wrap"
 
               }}
 
@@ -636,6 +698,24 @@ export default function App() {
                 onClick={() =>
                   setSelectedMessage("")
                 }
+
+                style={{
+
+                  padding: "10px 20px",
+
+                  border: "none",
+
+                  borderRadius: "10px",
+
+                  cursor: "pointer",
+
+                  background: "#5c3b1e",
+
+                  color: "white",
+
+                  fontSize: "16px"
+
+                }}
 
               >
 

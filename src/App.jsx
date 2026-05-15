@@ -16,9 +16,6 @@ import emailjs from "@emailjs/browser"
 
 export default function App() {
 
-  const WEBSITE_URL =
-    "https://pigeon-man.vercel.app"
-
   const [senderName, setSenderName] = useState("")
   const [senderEmail, setSenderEmail] = useState("")
 
@@ -29,13 +26,17 @@ export default function App() {
 
   const [searchEmail, setSearchEmail] = useState("")
 
-  const [foundLetters, setFoundLetters] = useState([])
+  const [foundLetters, setFoundLetters] =
+    useState([])
 
   const [selectedMessage, setSelectedMessage] =
     useState("")
 
   const [worldLetters, setWorldLetters] =
     useState([])
+
+  const WEBSITE_URL =
+    "https://pigeon-man.vercel.app"
 
   useEffect(() => {
 
@@ -52,7 +53,13 @@ export default function App() {
 
     snapshot.forEach((doc) => {
 
-      letters.push(doc.data())
+      letters.push({
+
+        id: doc.id,
+
+        ...doc.data()
+
+      })
 
     })
 
@@ -63,11 +70,15 @@ export default function App() {
   async function sendPigeon() {
 
     if (
+
       !senderName ||
       !senderEmail ||
+
       !receiverName ||
       !receiverEmail ||
+
       !message
+
     ) {
 
       alert("Fill all fields 🕊️")
@@ -77,19 +88,35 @@ export default function App() {
 
     try {
 
-      await addDoc(collection(db, "letters"), {
+      // SAVE TO FIREBASE
 
-        senderName,
-        senderEmail,
+      const docRef = await addDoc(
 
-        receiverName,
-        receiverEmail,
+        collection(db, "letters"),
 
-        message,
+        {
 
-        createdAt: Date.now()
+          senderName,
+          senderEmail,
 
-      })
+          receiverName,
+          receiverEmail,
+
+          message,
+
+          createdAt: Date.now()
+
+        }
+
+      )
+
+      // REAL WEBSITE LINK
+
+      const pigeonLink =
+
+        `${WEBSITE_URL}/?id=${docRef.id}`
+
+      // SEND EMAIL
 
       await emailjs.send(
 
@@ -105,7 +132,7 @@ export default function App() {
 
           receiver_email: receiverEmail,
 
-          website_url: WEBSITE_URL
+          pigeon_link: pigeonLink
 
         },
 
@@ -117,8 +144,10 @@ export default function App() {
 
       setSenderName("")
       setSenderEmail("")
+
       setReceiverName("")
       setReceiverEmail("")
+
       setMessage("")
 
       loadWorldLetters()
@@ -136,6 +165,7 @@ export default function App() {
   async function openPigeons() {
 
     const snapshot =
+
       await getDocs(collection(db, "letters"))
 
     const letters = []
@@ -307,6 +337,8 @@ export default function App() {
 
       }
 
+      {/* SEND PIGEON */}
+
       <div
 
         style={{
@@ -420,6 +452,8 @@ export default function App() {
 
       </div>
 
+      {/* OPEN LETTERS */}
+
       <div
 
         style={{
@@ -483,6 +517,8 @@ export default function App() {
 
       </div>
 
+      {/* PERSONAL LETTERS */}
+
       {
 
         foundLetters.map((letter, index) => (
@@ -534,6 +570,8 @@ export default function App() {
         ))
 
       }
+
+      {/* LETTER POPUP */}
 
       {
 
@@ -591,7 +629,6 @@ export default function App() {
               {selectedMessage}
 
               <br />
-
               <br />
 
               <button

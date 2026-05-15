@@ -1,21 +1,22 @@
 import "./App.css"
 
-import sky from "./assets/sky.png"
-import pigeon from "./assets/pigeon.png"
-import scroll from "./assets/scroll.png"
-
 import { useState, useEffect } from "react"
+
 import { motion } from "framer-motion"
 
 import emailjs from "@emailjs/browser"
-
-import { db } from "./firebase"
 
 import {
   collection,
   addDoc,
   getDocs
 } from "firebase/firestore"
+
+import { db } from "./firebase"
+
+import sky from "./assets/sky.png"
+import pigeon from "./assets/pigeon.png"
+import scroll from "./assets/scroll.png"
 
 export default function App() {
 
@@ -40,14 +41,14 @@ export default function App() {
   const [searchEmail, setSearchEmail] =
     useState("")
 
-  const [worldLetters, setWorldLetters] =
-    useState([])
-
   const [foundLetters, setFoundLetters] =
     useState([])
 
+  const [worldLetters, setWorldLetters] =
+    useState([])
+
   const [selectedMessage, setSelectedMessage] =
-    useState("")
+    useState(null)
 
   useEffect(() => {
 
@@ -92,7 +93,7 @@ export default function App() {
 
     ) {
 
-      alert("Fill all fields ")
+      alert("Fill all fields 🕊️")
 
       return
 
@@ -100,30 +101,25 @@ export default function App() {
 
     try {
 
-      const docRef =
-        await addDoc(
+      await addDoc(
 
-          collection(db, "letters"),
+        collection(db, "letters"),
 
-          {
+        {
 
-            senderName,
-            senderEmail,
+          senderName,
+          senderEmail,
 
-            receiverName,
-            receiverEmail,
+          receiverName,
+          receiverEmail,
 
-            message,
+          message,
 
-            createdAt: Date.now()
+          createdAt: Date.now()
 
-          }
+        }
 
-        )
-
-      const pigeonLink =
-
-        `${WEBSITE_URL}`
+      )
 
       await emailjs.send(
 
@@ -139,7 +135,7 @@ export default function App() {
 
           receiver_email: receiverEmail,
 
-          pigeon_link: pigeonLink
+          pigeon_link: WEBSITE_URL
 
         },
 
@@ -187,7 +183,7 @@ export default function App() {
       if (
 
         data.receiverEmail
-          .toLowerCase()
+          ?.toLowerCase()
 
         ===
 
@@ -256,7 +252,7 @@ export default function App() {
 
       </h1>
 
-      {/* RANDOM WORLD PIGEONS */}
+      {/* WORLD PIGEONS */}
 
       {
 
@@ -272,13 +268,18 @@ export default function App() {
 
               onClick={() =>
 
-                setSelectedMessage(
+                setSelectedMessage({
 
-                  `🕊️ From ${letter.senderName} to ${letter.receiverName}
+                  sender:
+                    letter.senderName,
 
-${letter.message}`
+                  receiver:
+                    letter.receiverName,
 
-                )
+                  message:
+                    letter.message
+
+                })
 
               }
 
@@ -318,7 +319,7 @@ ${letter.message}`
               transition={{
 
                 duration:
-                  12 +
+                  15 +
                   Math.random() * 10,
 
                 repeat: Infinity,
@@ -343,7 +344,7 @@ ${letter.message}`
 
       }
 
-      {/* SEND PIGEON */}
+      {/* SEND BOX */}
 
       <div
 
@@ -384,7 +385,7 @@ ${letter.message}`
 
         >
 
-          Send a Pigeon 
+          Send a Pigeon 🕊️
 
         </h2>
 
@@ -421,12 +422,17 @@ ${letter.message}`
         />
 
         <textarea
+
           rows="7"
+
           placeholder="Write your secret letter..."
+
           value={message}
+
           onChange={(e) =>
             setMessage(e.target.value)
           }
+
         />
 
         <button
@@ -449,7 +455,7 @@ ${letter.message}`
 
         >
 
-          Send Pigeon 
+          Send Pigeon 🕊️
 
         </button>
 
@@ -538,7 +544,7 @@ ${letter.message}`
 
       </div>
 
-      {/* PERSONAL PIGEONS */}
+      {/* PERSONAL LETTER PIGEONS */}
 
       <div
 
@@ -546,9 +552,9 @@ ${letter.message}`
 
           display: "flex",
 
-          flexWrap: "wrap",
-
           justifyContent: "center",
+
+          flexWrap: "wrap",
 
           marginTop: "40px"
 
@@ -568,13 +574,18 @@ ${letter.message}`
 
               onClick={() =>
 
-                setSelectedMessage(
+                setSelectedMessage({
 
-                  `🕊️ From ${letter.senderName} to ${letter.receiverName}
+                  sender:
+                    letter.senderName,
 
-${letter.message}`
+                  receiver:
+                    letter.receiverName,
 
-                )
+                  message:
+                    letter.message
+
+                })
 
               }
 
@@ -641,7 +652,7 @@ ${letter.message}`
 
               alignItems: "center",
 
-              zIndex: 999
+              zIndex: 9999
 
             }}
 
@@ -660,27 +671,35 @@ ${letter.message}`
                 backgroundRepeat:
                   "no-repeat",
 
-                width: "600px",
+                width: "700px",
 
-                height: "800px",
+                height: "900px",
 
-                paddingTop: "140px",
+                paddingTop: "170px",
 
-                paddingLeft: "90px",
+                paddingLeft: "120px",
 
-                paddingRight: "90px",
+                paddingRight: "120px",
 
-                paddingBottom: "140px",
+                paddingBottom: "170px",
 
                 boxSizing: "border-box",
 
-                color: "#3b2414",
+                display: "flex",
+
+                flexDirection: "column",
+
+                justifyContent: "center",
+
+                alignItems: "center",
+
+                textAlign: "center",
+
+                color: "#4b2e19",
+
+                fontSize: "28px",
 
                 fontFamily: "serif",
-
-                fontSize: "22px",
-
-                overflowY: "auto",
 
                 whiteSpace: "pre-wrap"
 
@@ -688,7 +707,26 @@ ${letter.message}`
 
             >
 
-              {selectedMessage}
+              🕊️ From {
+
+                selectedMessage.sender
+
+              }
+
+              to {
+
+                selectedMessage.receiver
+
+              }
+
+              <br />
+              <br />
+
+              {
+
+                selectedMessage.message
+
+              }
 
               <br />
               <br />
@@ -696,24 +734,22 @@ ${letter.message}`
               <button
 
                 onClick={() =>
-                  setSelectedMessage("")
+                  setSelectedMessage(null)
                 }
 
                 style={{
 
                   padding: "10px 20px",
 
-                  border: "none",
-
                   borderRadius: "10px",
 
-                  cursor: "pointer",
+                  border: "none",
 
                   background: "#5c3b1e",
 
                   color: "white",
 
-                  fontSize: "16px"
+                  cursor: "pointer"
 
                 }}
 

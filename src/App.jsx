@@ -8,7 +8,7 @@ import { db } from "./firebase"
 import sky from "./assets/sky.png"
 import pigeon from "./assets/pigeon.png"
 import scroll from "./assets/scroll.png"
-// import missile from "./assets/missile.png"  ← drop missile.png in assets/ and uncomment
+import missile from "./assets/missile.png" 
 
 const FIELDS = [
   { key: "senderName",    placeholder: "Your name, soldier...",                  type: "text"     },
@@ -226,14 +226,18 @@ export default function App() {
             }}
           >
             {isMissile ? (
-              // Swap emoji for: <img src={missile} style={{ width: 80, transform: `scaleX(${flip})`, filter:"drop-shadow(0 2px 8px rgba(255,80,0,0.6))" }} />
-              <div style={{
-                fontSize: "40px",
-                transform: `scaleX(${flip})`,
-                filter: "drop-shadow(0 2px 10px rgba(255,100,0,0.55))",
-                display: "inline-block",
-                lineHeight: 1,
-              }}>🚀</div>
+              // Swap emoji for: 
+              <img
+              src={missile}
+              alt=""
+              style={{
+                width: "80px",
+                display: "block",
+                transform: flier.goingRight ? "scaleX(1)" : "scaleX(-1)",
+                transformOrigin: "center",
+                filter: "drop-shadow(0 2px 8px rgba(255,80,0,0.6))",
+              }}
+            />
             ) : (
               <img
                 src={pigeon}

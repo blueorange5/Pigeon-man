@@ -98,15 +98,51 @@ export default function App() {
   }
 
   async function submitLetter(data) {
+  try {
+    // Save to Firestore first
+    await addDoc(collection(db, "letters"), {
+      ...data,
+      createdAt: Date.now(),
+    })
+
+    // Show success immediately
+    setDone(true)
+    loadWorldLetters()
+
+    setTimeout(() => {
+      setSending(false)
+      setDone(false)
+    }, 3000)
+
+    // Try sending email separately
     try {
-      await addDoc(collection(db, "letters"), { ...data, createdAt: Date.now() })
-      await emailjs.send("service_nkf4bj5", "template_yg1vy7s", {
-        sender_name: data.senderName, receiver_name: data.receiverName,
-        receiver_email: data.receiverEmail, pigeon_link: WEBSITE_URL,
-      }, "yt1sGLx6DMWfhP3hC")
-      setDone(true); loadWorldLetters()
-      setTimeout(() => { setSending(false); setDone(false) }, 3000)
-    } catch (e) { console.error(e); alert("The pigeon got shot down. Try again.") }
+      const response = await emailjs.send(
+        "service_ic3vhi9",
+        "template_zaiur1d",
+        {
+          sender_name: data.senderName,
+          receiver_name: data.receiverName,
+          receiver_email: data.receiverEmail,
+          pigeon_link: WEBSITE_URL,
+        },
+        "LmKYLDvwfcF3jtKyJ"
+      )
+
+      console.log("EMAIL SUCCESS:", response)
+
+    } catch (emailError) {
+      console.error("EMAIL FAILED FULL ERROR:", emailError)
+
+      alert(
+        "Email failed:\n" +
+        JSON.stringify(emailError)
+      )
+    }
+
+    } catch (firestoreError) {
+      console.error("Firestore failed:", firestoreError)
+      alert("The pigeon got shot down. Try again.")
+    }
   }
 
   async function openPigeons() {

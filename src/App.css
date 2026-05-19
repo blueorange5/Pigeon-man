@@ -1,3 +1,29 @@
+/* ── Mobile responsiveness ── */
+
+/* Desktop/tablet: show top-right read button, hide bottom one */
+.read-btn-mobile { display: none !important; }
+.read-btn-desktop { display: block; }
+
+@media (max-width: 480px) {
+  /* Mobile: hide top-right read button, show bottom one */
+  .read-btn-desktop { display: none !important; }
+  .read-btn-mobile { display: block !important; }
+
+  /* Shrink flying pigeons/missiles on small screens */
+  .flier-pigeon {
+    width: 44px !important;
+  }
+  .flier-missile {
+    width: 52px !important;
+  }
+
+  /* Dismiss hint: move closer to edge */
+  .dismiss-hint {
+    top: 10px !important;
+    right: 10px !important;
+  }
+}
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;

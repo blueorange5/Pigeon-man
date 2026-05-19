@@ -19,13 +19,13 @@ const FIELDS = [
 ]
 
 const WAR_MISSILE_MESSAGES = [
-  "⚠️ Enemy aircraft spotted! Use pigeons — radios are compromised.",
-  "🔥 The skies are not safe. Only feathers can carry our words now.",
-  "💣 Every missile fired means another pigeon must fly.",
-  "🪖 In war, trust no wire. Trust only wings.",
-  "📡 All communication lines are down. Pigeons are our last hope.",
-  "🚀 They shoot our planes. But they can't shoot every pigeon.",
-  "⚔️ The front lines are silent — except for the flutter of wings.",
+  "In a world filled with war, every pigeon carries a piece of hope.",
+  "When the skies grow dark, even the smallest wings can guide us forward.",
+  "No matter how loud the missiles fall, kindness still finds a way to fly.",
+  "In times of chaos, messages of peace travel the farthest.",
+  "Even when nations clash, humanity survives in every letter delivered.",
+  "The world may burn with conflict, but hope still rises on fragile wings.",
+  "Where fear silences voices, courage takes flight like a pigeon in the storm.",
 ]
 
 const WAR_FLAVOURS = [
@@ -169,8 +169,10 @@ export default function App() {
       // Center cluster: viewport center ± offsets
       // landX/landY are in vw/vh units relative to viewport, we'll use fixed positioning
       const totalCols = Math.min(letters.length, cols)
-      const offsetX = (col - (totalCols - 1) / 2) * 110  // px spread horizontally
-      const offsetY = (row - 0.5) * 110                   // px spread vertically
+      const spreadX = Math.min(110, window.innerWidth * 0.22)
+      const spreadY = Math.min(110, window.innerHeight * 0.15)
+      const offsetX = (col - (totalCols - 1) / 2) * spreadX
+      const offsetY = (row - 0.5) * spreadY
       return {
         uid: `inbound-${i}-${Date.now()}`,
         letter,
@@ -266,6 +268,7 @@ export default function App() {
               <img
               src={missile}
               alt=""
+              className="flier-missile"
               style={{
                 width: "80px",
                 display: "block",
@@ -278,6 +281,7 @@ export default function App() {
               <img
                 src={pigeon}
                 alt=""
+                className="flier-pigeon"
                 style={{
                   width: "70px",
                   display: "block",
@@ -367,7 +371,7 @@ export default function App() {
             exit={{ opacity: 0 }}
             style={{
               position: "fixed",
-              top: 20,
+              top: 80,
               right: 20,
               zIndex: 9,
               display: "flex",
@@ -375,6 +379,7 @@ export default function App() {
               alignItems: "flex-end",
               gap: 8,
             }}
+            className="dismiss-hint"
           >
             <div style={{
               background: "rgba(0,0,0,0.55)",
@@ -408,41 +413,25 @@ export default function App() {
       </AnimatePresence>
 
 
-      <motion.button
-        onClick={() => { setReading(true); setSearchEmail(""); setFoundLetters([]); setInboundPigeons([]) }}
-        style={{
-          position: "fixed", top: 20, left: 20,
-          background: `url(${scroll}) center/cover no-repeat`,
-          border: "none", cursor: "pointer",
-          padding: "14px 28px",
-          color: "#4b2e19",
-          fontFamily: "'Georgia', serif",
-          fontWeight: "bold",
-          fontSize: "14px",
-          minWidth: "170px",
-          minHeight: "52px",
-          zIndex: 10,
-        }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.97 }}
-      >
-        read received letter
-      </motion.button>
-
-      {/* ── CENTER TOP: TITLE BANNER ── */}
+      {/* ── TOP BAR: title center + read button top-right (desktop/tablet) ── */}
       <div style={{
-        position: "fixed", top: 14,
-        left: "50%", transform: "translateX(-50%)",
+        position: "fixed", top: 0, left: 0, right: 0,
         zIndex: 10,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "10px 12px",
       }}>
+        {/* Title */}
         <div style={{
           background: `url(${scroll}) center/cover no-repeat`,
-          padding: "18px 60px",
-          minWidth: "260px", minHeight: "70px",
+          padding: "12px 32px",
+          minWidth: "180px", minHeight: "52px",
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
           <h1 style={{
-            margin: 0, fontSize: "42px",
+            margin: 0,
+            fontSize: "clamp(22px, 5vw, 42px)",
             color: "#3b1f0a",
             fontFamily: "'Georgia', serif",
             fontWeight: "900", letterSpacing: "2px",
@@ -452,16 +441,64 @@ export default function App() {
             Pigeon Man
           </h1>
         </div>
+
+        {/* Read button — top-left, hidden on mobile */}
+        <motion.button
+          className="read-btn-desktop"
+          onClick={() => { setReading(true); setSearchEmail(""); setFoundLetters([]); setInboundPigeons([]) }}
+          style={{
+            position: "absolute", left: 20,
+            background: `url(${scroll}) center/cover no-repeat`,
+            border: "none", cursor: "pointer",
+            padding: "10px 18px",
+            color: "#4b2e19",
+            fontFamily: "'Georgia', serif",
+            fontWeight: "bold",
+            fontSize: "14px",
+            minWidth: "170px",
+            minHeight: "52px",
+          }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
+        >
+          read received letter
+        </motion.button>
       </div>
 
-      {/* ── BOTTOM CENTER: SEND BUTTON / INPUT FLOW ── */}
+      {/* ── BOTTOM CENTER: READ + SEND BUTTONS / INPUT FLOW ── */}
       <div style={{
-        position: "fixed", bottom: 36,
+        position: "fixed", bottom: 24,
         left: "50%", transform: "translateX(-50%)",
         zIndex: 20, textAlign: "center",
         width: "100%", maxWidth: "520px",
-        padding: "0 20px", boxSizing: "border-box",
+        padding: "0 16px", boxSizing: "border-box",
+        display: "flex", flexDirection: "column", alignItems: "center", gap: "10px",
       }}>
+        {/* Read button — bottom stack, mobile only */}
+        <AnimatePresence>
+          {!sending && !done && (
+            <motion.button
+              key="read-btn-mobile"
+              className="read-btn-mobile"
+              onClick={() => { setReading(true); setSearchEmail(""); setFoundLetters([]); setInboundPigeons([]) }}
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
+              whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}
+              style={{
+                background: `url(${scroll}) center/cover no-repeat`,
+                border: "none", cursor: "pointer",
+                padding: "12px 28px",
+                color: "#4b2e19",
+                fontFamily: "'Georgia', serif",
+                fontWeight: "bold",
+                fontSize: "clamp(12px, 3.5vw, 14px)",
+                minWidth: "min(220px, 70vw)", minHeight: "44px",
+              }}
+            >
+              read received letter
+            </motion.button>
+          )}
+        </AnimatePresence>
+
         <AnimatePresence mode="wait">
 
           {!sending && !done && (
@@ -473,11 +510,11 @@ export default function App() {
               style={{
                 background: `url(${scroll}) center/cover no-repeat`,
                 border: "none", cursor: "pointer",
-                padding: "20px 60px",
+                padding: "20px 40px",
                 color: "#3b1f0a",
                 fontFamily: "'Georgia', serif",
-                fontWeight: "bold", fontSize: "18px",
-                minWidth: "300px", minHeight: "64px",
+                fontWeight: "bold", fontSize: "clamp(15px, 4vw, 18px)",
+                minWidth: "min(300px, 80vw)", minHeight: "64px",
               }}
             >
               send a letter with pijohn
@@ -691,23 +728,26 @@ export default function App() {
                   backgroundSize: "contain",
                   backgroundPosition: "center",
                   backgroundRepeat: "no-repeat",
-                  width: "600px", maxWidth: "92vw",
-                  minHeight: "750px",
-                  paddingTop: "160px", paddingLeft: "100px",
-                  paddingRight: "100px", paddingBottom: "160px",
+                  width: "min(600px, 92vw)", maxWidth: "92vw",
+                  minHeight: "min(750px, 85vh)",
+                  paddingTop: "clamp(80px, 20%, 160px)",
+                  paddingLeft: "clamp(24px, 16%, 100px)",
+                  paddingRight: "clamp(24px, 16%, 100px)",
+                  paddingBottom: "clamp(80px, 20%, 160px)",
                   boxSizing: "border-box", textAlign: "center",
                   color: "#4b2e19", fontFamily: "'Georgia',serif",
                   display: "flex", flexDirection: "column",
                   alignItems: "center", justifyContent: "center", gap: "12px",
+                  overflowY: "auto",
                 }}
               >
-                <p style={{ fontSize: "13px", fontStyle: "italic", margin: 0, opacity: 0.62 }}>
+                <p style={{ fontSize: "clamp(11px, 3vw, 13px)", fontStyle: "italic", margin: 0, opacity: 0.62 }}>
                   {selectedMessage.flavour}
                 </p>
-                <p style={{ fontSize: "17px", fontWeight: "bold", margin: "4px 0" }}>
+                <p style={{ fontSize: "clamp(14px, 3.5vw, 17px)", fontWeight: "bold", margin: "4px 0" }}>
                   From {selectedMessage.senderName}
                 </p>
-                <p style={{ fontSize: "19px", whiteSpace: "pre-wrap", lineHeight: 1.7, margin: 0 }}>
+                <p style={{ fontSize: "clamp(15px, 4vw, 19px)", whiteSpace: "pre-wrap", lineHeight: 1.7, margin: 0 }}>
                   {selectedMessage.message}
                 </p>
                 <button onClick={() => setSelectedMessage(null)} style={{
